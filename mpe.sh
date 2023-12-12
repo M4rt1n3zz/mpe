@@ -1,7 +1,7 @@
 #!/bin/bash
 # TODO List
 # 1. Add more checks
-# 2. Do some improvments 
+# 2. Do some improvments
 
 # My Privilege Escalation Info and my Blog Website
 version="Version: v0.33"
@@ -118,36 +118,47 @@ host_discovery() {
 ipv4_address=$(ifconfig eth0 | awk '/inet / {print $2}' | cut -d ':' -f2)
 
 if [ -z "$ipv4_address" ]; then
-    echo "Unable to retrieve IPv4 address from eth0. Exiting."
+    echo "Unable to Retrieve IPv4 Address from eth0. Exiting."
     exit 1
 fi
 
 # Extract the subnet from the obtained IPv4 address
 subnet=$(echo "$ipv4_address" | cut -d '.' -f 1-3)
 
-echo -e "\e\n[33m[*] Local IPv4 address:\e[0m \e[97mIP: $ipv4_address\e[0m"
-echo -e "\e\n[33m[*] Scanning Subnet:\e[0m \e[97mIPs: $subnet\e[0m"
+echo -e "\e[33m[*] Local IPv4 Address:\e[0m $ipv4_address"
+echo -e "\e[35m[*] Scanning Subnet:\e[0m $subnet"
 
-# Perform host discovery on the local subnet
-for i in {1..255}; do
+# Perform host discovery on the local subnet and save alive hosts in a variable
+alive_hosts=$(for i in {1..255}; do
     ip_address="$subnet.$i"
     (ping -c 1 "$ip_address" 2>/dev/null | grep "bytes from" | cut -d ' ' -f4 | tr -d ':' &)
-done
+done)
 
 # Wait for all background jobs to finish
 wait
+
+# Display the alive hosts
+echo -e "$alive_hosts"
 }
 
-# Perform port discovery on the local machine, on top 10000 ports with a timeout of 1 second per port using a for loop
+# Prompt user to continue with port scanning
 port_scaning() {
-echo -e "\e\n[33m[*] Scaning Open Ports on:\e[0m \e[97mIP: $ipv4_address\e[0m"
-for port in {1..10000}; do
-    { echo >/dev/tcp/"$ipv4_address"/"$port"; } 2>/dev/null &&
-    echo "Port $port is open" &
-done
+read -p "Do you want to continue scanning ports on these hosts? (yes/no): " choice
 
-# Wait for all background jobs to finish
-wait
+if [ "$choice" == "yes" ]; then
+    # Perform port discovery for each alive host
+    for host in $alive_hosts; do
+        echo -e "\e[35m[*] Scanning Ports on:\e[0m $host"
+        for port in {1..5000}; do
+            { echo >/dev/tcp/"$host"/"$port"; } 2>/dev/null &&
+            echo -e "Port $port is \e[92mopen\e[0m" &
+        done
+        # Wait for all background jobs to finish before moving to the next host
+        wait
+    done
+else
+    echo -e "\e[31m[-] Port scanning skipped. Exiting.\e[0m"
+fi
 }
 
 # Checking what is on Local Network
