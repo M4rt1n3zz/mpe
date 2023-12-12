@@ -27,7 +27,7 @@ Subnet Extraction: It extracts the subnet from the obtained IPv4 address.
 
 Host Discovery: The script performs host discovery on the local subnet by pinging each potential host.
 
-Port Discovery: It conducts port discovery on the local machine, checking for open ports in the range of 1 to 1000 with a timeout of 1 second per port.
+Port Discovery: It conducts port discovery on the local machine, checking for open ports in the range of 1 to 1000.
 
 Background Jobs: The script uses background jobs for efficiency, allowing multiple tasks to be executed simultaneously.
 
