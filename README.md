@@ -30,7 +30,7 @@ Run the script:
 - List useful binaries installed on the target
 - Check for SUID and GUID binaries
 - Perform host discovery on the local subnet
-- Scan the top 10000 ports on the local machine
+- Scan the top 1000 ports on the local machine
 - Display network status using netstat
 - Check crontabs
 - Display processes running as root
