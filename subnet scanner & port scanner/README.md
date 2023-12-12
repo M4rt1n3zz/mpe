@@ -1,4 +1,10 @@
-# Network Discovery Script
+# Content Table:
+
+- [Network Discovery Script](#Network-Discovery-Script)
+- [Usage](#Usage)
+- [Description](#Description)
+- [Notes](#Notes)
+## Network Discovery Script
 
 This Bash script performs network discovery on the local machine. It retrieves the local machine's IPv4 address, extracts the subnet, and scans the subnet for live hosts. Additionally, it performs port discovery on the local machine to identify open ports.
 
