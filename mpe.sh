@@ -4,7 +4,7 @@
 # 2. Do some improvments 
 
 # My Privilege Escalation Info and my Blog Website
-version="Version: v0.32"
+version="Version: v0.33"
 name="-=MPE=- Linux Enumeration Script"
 site="https://redops.cc"
 echo -e "\e[33m$name\e[0m\n\e[31m$version\e[0m \e[32m$site\e\n[0m"
@@ -113,6 +113,43 @@ check_guid_binaries() {
     done < <(find / -perm -2000 -type f -exec ls -l {} \; 2>/dev/null)
 }
 
+# Get the local machine's IPv4 address from eth0 using ifconfig
+host_discovery() {
+ipv4_address=$(ifconfig eth0 | awk '/inet / {print $2}' | cut -d ':' -f2)
+
+if [ -z "$ipv4_address" ]; then
+    echo "Unable to retrieve IPv4 address from eth0. Exiting."
+    exit 1
+fi
+
+# Extract the subnet from the obtained IPv4 address
+subnet=$(echo "$ipv4_address" | cut -d '.' -f 1-3)
+
+echo -e "\e\n[33m[*] Local IPv4 address:\e[0m \e[97mIP: $ipv4_address\e[0m"
+echo -e "\e\n[33m[*] Scanning Subnet:\e[0m \e[97mIPs: $subnet\e[0m"
+
+# Perform host discovery on the local subnet
+for i in {1..255}; do
+    ip_address="$subnet.$i"
+    (ping -c 1 "$ip_address" 2>/dev/null | grep "bytes from" | cut -d ' ' -f4 | tr -d ':' &)
+done
+
+# Wait for all background jobs to finish
+wait
+}
+
+# Perform port discovery on the local machine, on top 10000 ports with a timeout of 1 second per port using a for loop
+port_scaning() {
+echo -e "\e\n[33m[*] Scaning Open Ports on:\e[0m \e[97mIP: $ipv4_address\e[0m"
+for port in {1..10000}; do
+    { echo >/dev/tcp/"$ipv4_address"/"$port"; } 2>/dev/null &&
+    echo "Port $port is open" &
+done
+
+# Wait for all background jobs to finish
+wait
+}
+
 # Checking what is on Local Network
 check_network() {
     echo -e "\e[33m[*] Checking Whats on Local Network:\e[0m"
@@ -163,6 +200,10 @@ perform_checks() {
     check_suid_binaries
     echo ""
     check_guid_binaries
+    echo ""
+    host_discovery
+    echo ""
+    port_scaning
     echo ""
     check_network
     echo ""
