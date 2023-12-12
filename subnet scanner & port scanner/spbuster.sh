@@ -12,23 +12,30 @@ fi
 subnet=$(echo "$ipv4_address" | cut -d '.' -f 1-3)
 
 echo "Local IPv4 address: $ipv4_address"
-echo "Scanning Subnet: $subnet"
+echo "Scanning subnet: $subnet"
 
-# Perform host discovery on the local subnet
-for i in {1..255}; do
+# Perform host discovery on the local subnet and save alive hosts in a variable
+alive_hosts=$(for i in {1..255}; do
     ip_address="$subnet.$i"
     (ping -c 1 "$ip_address" 2>/dev/null | grep "bytes from" | cut -d ' ' -f4 | tr -d ':' &)
-done
+done)
 
 # Wait for all background jobs to finish
 wait
 
-# Perform port discovery on the local machine with a timeout of 1 second per port using a for loop
-echo -e "\nOpen Ports on $ipv4_address:"
-for port in {1..10000}; do
-    { echo >/dev/tcp/"$ipv4_address"/"$port"; } 2>/dev/null &&
-    echo "Port $port is open" &
-done
+# Display the alive hosts
+echo -e "\n$alive_hosts"
 
-# Wait for all background jobs to finish
-wait
+# Export alive hosts into a variable
+export alive_hosts
+
+# Perform port discovery for each alive host
+for host in $alive_hosts; do
+    echo -e "\nScaning Ports on: $host"
+    for port in {1..10000}; do
+        { echo >/dev/tcp/"$host"/"$port"; } 2>/dev/null &&
+        echo "Port $port is open" &
+    done
+    # Wait for all background jobs to finish before moving to the next host
+    wait
+done

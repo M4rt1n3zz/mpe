@@ -1,7 +1,6 @@
 # Content Table:
 
 - [Linux Enumeration Script (MPE](#Linux-Enumeration-Script-(MPE))
-- [Overview](#Overview)
 - [Features](#Features)
 - [To-Do List](#To-Do-List)
 
@@ -17,11 +16,6 @@ Run the script:
 ```bash
 ./linux_enumeration.sh
 ```
-## Overview
-
-- **Version:** v0.33
-- **Author:** m4rt1n3zz
-- **Website:** [redops.cc](https://redops.cc/)
 
 ## Features
 

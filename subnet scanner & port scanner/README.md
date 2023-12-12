@@ -38,14 +38,24 @@ The discovered hosts and open ports will be displayed in the script's output.
 
 Example Output:
 ```bash
-Local IPv4 address: 192.168.1.1
-Scanning Subnet: 192.168.1
+➜  ~ ./host1.sh
+Local IPv4 address: 192.168.1.10
+Scanning subnet: 192.168.1
 
-Discovered Hosts:
-192.168.1.2
+192.168.1.1
+192.168.1.10
+192.168.1.12
 192.168.1.3
 
-Open Ports on 192.168.1.1:
+Scaning Ports on: 192.168.1.1
+
+Scaning Ports on: 192.168.1.10
 Port 22 is open
 Port 80 is open
+Port 445 is open
+
+Scaning Ports on: 192.168.1.12
+Port 21 is open
+
+Scaning Ports on: 192.168.1.3
 ```
